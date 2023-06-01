@@ -94,3 +94,5 @@ outTmp/
 /test.output
 /kotlin-native/dist
 kotlin-ide/
+coollection.json
+gradle\wraper
