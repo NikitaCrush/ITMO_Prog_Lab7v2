@@ -16,6 +16,9 @@ dependencies {
     implementation ("org.jetbrains.exposed:exposed-core:0.35.1")
     implementation ("org.jetbrains.exposed:exposed-dao:0.35.1")
     implementation ("org.jetbrains.exposed:exposed-jdbc:0.35.1")
+    implementation("org.bitbucket.b_c:jose4j:0.7.2")
+    implementation("commons-codec:commons-codec:1.15")
+    implementation ("ch.qos.logback:logback-classic:1.2.9")
     testImplementation(kotlin("test"))
     implementation(kotlin("stdlib"))
 
