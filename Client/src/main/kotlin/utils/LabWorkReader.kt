@@ -54,7 +54,6 @@ class LabWorkReader(private val readLineFn: () -> String, private val validator:
         }
     }
 
-
     /**
      * Reads and validates the minimal point of a LabWork object from user input.
      *
@@ -63,7 +62,6 @@ class LabWorkReader(private val readLineFn: () -> String, private val validator:
     private fun readMinimalPoint(): Int {
         return readInt(Messages.ENTER_MINIMAL_POINT, readLineFn, validator::validateMinimalPoint)
     }
-
 
     /**
      * Reads and validates the difficulty of a LabWork object from user input.
@@ -119,6 +117,7 @@ class LabWorkReader(private val readLineFn: () -> String, private val validator:
      * @return The created LabWork object.
      */
     fun readLabWork(
+        owner: String,
         id: Long = IdGenerator.generateUniqueId(),
         creationDate: LocalDateTime = LocalDateTime.now()
     ): LabWork {
@@ -129,14 +128,15 @@ class LabWorkReader(private val readLineFn: () -> String, private val validator:
         val difficulty = readDifficulty()
         val discipline = readDiscipline()
         return LabWork(
-            id,
-            name,
-            coordinates,
-            creationDate,
-            minimalPoint,
-            personalQualitiesMinimum,
-            difficulty,
-            discipline
+            id = id,
+            name = name,
+            coordinates = coordinates,
+            creationDate = creationDate,
+            minimalPoint = minimalPoint,
+            personalQualitiesMinimum = personalQualitiesMinimum,
+            difficulty = difficulty,
+            discipline = discipline,
+            owner = owner
         )
     }
 
@@ -202,6 +202,4 @@ class LabWorkReader(private val readLineFn: () -> String, private val validator:
     private fun readSelfStudyHours(): Long {
         return readLong(readLineFn, validator::validateSelfStudyHours)
     }
-
-
 }
