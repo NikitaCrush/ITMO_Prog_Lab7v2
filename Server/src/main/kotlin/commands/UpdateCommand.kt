@@ -16,11 +16,11 @@ import kotlinx.serialization.json.Json
 
 class UpdateCommand : Command() {
     override val commandType = CommandType.ARG_AND_LABWORK
-    override val commandArgs = listOf(CommandArgument("id", "String"), CommandArgument("labwork", "LabWork"))
+    override val commandArgs = listOf(CommandArgument("id", "String"), CommandArgument("labwork", "LabWork"), CommandArgument("token", "String"))
 
-    override fun execute(args: List<Any>): String {
-        if (args.size < 2 || args[0] !is String) {
-            return "ID and/or LabWork object is not provided or has an incorrect format."
+    override fun execute(args: List<Any>, token: String?): String {
+        if (args.size < 3 || args[0] !is String) {
+            return "ID, LabWork object and/or token is not provided or has an incorrect format."
         }
 
         val id: Long = try {
@@ -31,6 +31,8 @@ class UpdateCommand : Command() {
 
         val labWorkJson = args[1] as String
         val updatedLabWork = Json.decodeFromString<LabWork>(labWorkJson)
+
+
 
         val labWorkToUpdate = labWorkCollection.show().find { it.id == id }
 

@@ -13,7 +13,7 @@ class SumOfMinimalPointCommand : Command() {
     override val commandType = CommandType.NO_ARG
     override val commandArgs = emptyList<CommandArgument>()
 
-    override fun execute(args: List<Any>): String {
+    override fun execute(args: List<Any>, token: String?): String {
         return labWorkCollection.sumOfMinimalPoint().toString()
     }
 }
