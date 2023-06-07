@@ -18,7 +18,7 @@ import utils.LocalDateTimeSerializer
  */
 @Serializable
 data class LabWork(
-    val id: Long,
+    var id: Long,
     val name: String,       //Поле не может быть null, Строка не может быть пустой
     val coordinates: Coordinates,//Поле не может быть null
     @Serializable(with = LocalDateTimeSerializer::class)
@@ -26,7 +26,8 @@ data class LabWork(
     val minimalPoint: Int,//Значение поля должно быть больше 0
     val personalQualitiesMinimum: Int,//Поле не может быть null, Значение поля должно быть больше 0
     val difficulty: Difficulty?,//Поле может быть null
-    val discipline: Discipline //Поле не может быть null
+    val discipline: Discipline, //Поле не может быть null
+    var owner: String
 ) : Comparable<LabWork>, java.io.Serializable {
 
     /**
