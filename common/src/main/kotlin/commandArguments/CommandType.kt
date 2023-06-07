@@ -7,5 +7,7 @@ enum class CommandType {
     NO_ARG,
     SINGLE_ARG,
     LABWORK_ARG,
-    ARG_AND_LABWORK
+    ARG_AND_LABWORK,
+    USER_REGISTRATION,
+    USER_LOGIN
 }
