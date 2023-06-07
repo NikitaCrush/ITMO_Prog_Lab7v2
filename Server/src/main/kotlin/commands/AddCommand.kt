@@ -16,16 +16,23 @@ class AddCommand : Command() {
     override val commandType = CommandType.LABWORK_ARG
     override val commandArgs = listOf(CommandArgument("labWork", "LabWork"))
 
-    override fun execute(args: List<Any>): String {
+    override fun execute(args: List<Any>, token: String?): String {
         if (args.isEmpty()) {
             throw IllegalArgumentException("Add command expects 1 argument, but got none.")
         }
+
+        val token = args.find { it is CommandArgument && it.name == "token" } as? String
+            ?: throw IllegalArgumentException("No token provided.")
+
+        val owner = userCollection.validateToken(token)
+            ?: throw IllegalArgumentException("Invalid token.")
+
 
         val labWorkJson = args[0] as? String
             ?: throw IllegalArgumentException("Argument for add command is not of type String.")
 
         val labWork = Json.decodeFromString<LabWork>(labWorkJson)
-
+        labWork.owner = owner
         labWorkCollection.add(labWork)
         return Messages.LAB_WORK_SUCCESS_ADD
     }

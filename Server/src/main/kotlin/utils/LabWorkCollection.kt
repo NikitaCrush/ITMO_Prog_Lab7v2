@@ -1,181 +1,180 @@
 package utils
 
-import data.Difficulty
-import data.LabWork
+import data.*
+import databaseManager.DatabaseManager
+import java.sql.Timestamp
 import java.time.LocalDate
-import java.util.PriorityQueue
-import kotlinx.serialization.builtins.ListSerializer
+import java.util.concurrent.ConcurrentSkipListSet
 
-/**
- * Class responsible for managing the LabWork collection.
- *
- * @property fileName The file name to use for loading and saving the LabWork collection.
- */
-class LabWorkCollection(private val fileName: String) {
-    private val labWorkQueue = PriorityQueue<LabWork>()
+class LabWorkCollection {
+    private val labWorkSet = ConcurrentSkipListSet<LabWork>()
+    private val databaseManager = DatabaseManager()
 
     init {
         System.err.println("LabWorkCollection created")
-        loadFromFile()
+        loadFromDatabase()
     }
 
-    /**
-     * Loads the LabWork collection from the file.
-     */
-    private fun loadFromFile() {
-        try {
-            val labWorkList = FileUtil.loadFromFile(fileName, ListSerializer(LabWork.serializer()))
-            labWorkList?.let { labWorkQueue.addAll(it) }
-        } catch (e: kotlinx.serialization.SerializationException) {
-            println("Error: Failed to load data from file. The file might be empty or contain invalid content. Starting with an empty collection.")
+    private fun loadFromDatabase() {
+        val connection = databaseManager.connection
+        val statement = connection?.createStatement()
+        val resultSet = statement?.executeQuery("SELECT * FROM LabWorks2")
+
+        while (resultSet?.next() == true) {
+            val labWork = LabWork(
+                id = resultSet.getLong("id"),
+                name = resultSet.getString("name"),
+                coordinates = Coordinates(
+                    x = resultSet.getLong("coordinate_x"),
+                    y = resultSet.getDouble("coordinate_y")
+                ),
+                creationDate = resultSet.getTimestamp("creation_date").toLocalDateTime(),
+                minimalPoint = resultSet.getInt("minimalPoint"),
+                personalQualitiesMinimum = resultSet.getInt("personalQualitiesMinimum"),
+                difficulty = resultSet.getString("difficulty")?.let { Difficulty.valueOf(it) },
+                discipline = Discipline(
+                    name = resultSet.getString("discipline_name"),
+                    selfStudyHours = resultSet.getLong("discipline_selfStudyHours")
+                ),
+                owner = resultSet.getString("owner")
+            )
+
+            labWorkSet.add(labWork)
+        }
+
+    }
+//eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InZydnIiLCJleHAiOjE2ODYxNjkzOTh9.m6Anf-Pce1ZYxe9zN4Bl1eYMFzvOaLG9q4cXojpILQg
+
+    fun add(labWork: LabWork): String {
+
+        val connection = databaseManager.connection
+        val preparedStatement = connection?.prepareStatement("""
+    INSERT INTO LabWorks2(
+        id, 
+        name, 
+        coordinate_x, 
+        coordinate_y, 
+        creation_date, 
+        minimalPoint, 
+        personalQualitiesMinimum, 
+        difficulty, 
+        discipline_name, 
+        discipline_selfStudyHours,
+        owner  
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+""")
+
+        // Assign owner to labWork object
+
+        preparedStatement?.setLong(1, labWork.id)
+        preparedStatement?.setString(2, labWork.name)
+        preparedStatement?.setLong(3, labWork.coordinates.x)
+        preparedStatement?.setDouble(4, labWork.coordinates.y)
+        preparedStatement?.setTimestamp(5, Timestamp.valueOf(labWork.creationDate))
+        preparedStatement?.setInt(6, labWork.minimalPoint)
+        preparedStatement?.setInt(7, labWork.personalQualitiesMinimum)
+        preparedStatement?.setString(8, labWork.difficulty?.name)
+        preparedStatement?.setString(9, labWork.discipline.name)
+        preparedStatement?.setLong(10, labWork.discipline.selfStudyHours)
+        preparedStatement?.setString(11, labWork.owner)
+
+        val rowsAffected = preparedStatement?.executeUpdate() ?: 0
+
+        if (rowsAffected > 0) {
+            labWorkSet.add(labWork)  // LabWork object already includes owner
+            return Messages.LAB_WORK_SUCCESS_ADD
+        } else {
+            throw IllegalStateException("Failed to add LabWork to the database")
         }
     }
 
-    /**
-     * Saves the LabWork collection to the file.
-     */
-    fun saveToFile() {
-        FileUtil.saveToFile(labWorkQueue.toList(), fileName, ListSerializer(LabWork.serializer()))
-    }
 
 
 
 
-    /**
-     * Adds a LabWork object to the collection.
-     *
-     * @param labWork The LabWork object to add.
-     */
-    fun add(labWork: LabWork) {
-        labWorkQueue.add(labWork)
-    }
-
-    /**
-     * Removes a LabWork object from the collection by its ID.
-     *
-     * @param id The ID of the LabWork object to remove.
-     * @return True if the object was removed, false otherwise.
-     */
     fun removeById(id: Long): Boolean {
-        val initialSize = labWorkQueue.size
-        labWorkQueue.removeIf { it.id == id }
-        return labWorkQueue.size < initialSize
+
+        val labWork = labWorkSet.find { it.id == id }
+        if (labWork != null) {
+            val connection = databaseManager.connection
+            val preparedStatement = connection?.prepareStatement("DELETE FROM LabWorks WHERE id = ?")
+
+            preparedStatement?.setLong(1, id)
+
+            preparedStatement?.executeUpdate()
+
+            databaseManager.close()
+
+            return labWorkSet.removeIf { it.id == id }
+        }
+
+        throw IllegalArgumentException("Cannot remove a lab work that you did not create")
     }
 
-
-    /**
-     * Clears the collection of all LabWork objects.
-     */
     fun clear() {
-        labWorkQueue.clear()
+        labWorkSet.clear()
     }
 
-    /**
-     * Returns a list of all LabWork objects in the collection.
-     *
-     * @return A list of LabWork objects.
-     */
     fun show(): List<LabWork> {
-        return labWorkQueue.toList()
+        return labWorkSet.toList()
     }
 
-    /**
-     * Returns the number of LabWork objects in the collection.
-     *
-     * @return The size of the collection.
-     */
     private fun size(): Int {
-        return labWorkQueue.size
+        return labWorkSet.size
     }
 
-    /**
-     * Returns the current date as a LocalDate object.
-     *
-     * @return The current date.
-     */
     private fun getCreationDate(): LocalDate {
         return LocalDate.now()
     }
 
-    /**
-     * Removes the first LabWork object in the collection.
-     */
     fun removeFirst() {
-        labWorkQueue.poll()
+        if (!labWorkSet.isEmpty()) {
+            labWorkSet.remove(labWorkSet.first())
+        }
     }
 
-    /**
-     * Calculates the sum of the minimal points of all LabWork objects in the collection.
-     *
-     * @return The sum of minimal points.
-     */
     fun sumOfMinimalPoint(): Int {
-        return this.labWorkQueue.sumOf { it.minimalPoint }
+        return this.labWorkSet.sumOf { it.minimalPoint }
     }
 
-    /**
-     * Returns the LabWork object with the lowest difficulty in the collection.
-     *
-     * @return The LabWork object with the lowest difficulty or null if the collection is empty.
-     */
     fun minByDifficulty(): LabWork? {
-        return labWorkQueue.minByOrNull { it.difficulty ?: Difficulty.EASY }
+        return labWorkSet.minByOrNull { it.difficulty ?: Difficulty.EASY }
     }
 
-    /**
-     * Returns a set of unique minimal point values in the collection.
-     *
-     * @return A set of unique minimal point values.
-     */
     fun printUniqueMinimalPoint(): Set<Int> {
-        return labWorkQueue.map { it.minimalPoint }.toSet()
+        return labWorkSet.map { it.minimalPoint }.toSet()
     }
 
-    /**
-     * Adds a LabWork object to the collection if its ID is greater than the current maximum ID.
-     *
-     * @param labWork The LabWork object to add.
-     * @return True if the object was added, false otherwise.
-     */
     fun addIfMax(labWork: LabWork): Boolean {
-        val maxLabWork = labWorkQueue.maxWithOrNull(compareBy { it.id })
+        val maxLabWork = labWorkSet.maxWithOrNull(compareBy { it.id })
         if (maxLabWork == null || compareBy<LabWork> { it.id }.compare(maxLabWork, labWork) < 0) {
-            labWorkQueue.add(labWork)
+            labWorkSet.add(labWork)
             return true
         }
         return false
     }
 
-    /**
-     * Removes and returns the first LabWork object in the collection.
-     *
-     * @return The removed LabWork object or null if the collection is empty.
-     */
     fun removeHead(): LabWork? {
-        return labWorkQueue.poll()
+        return if (!labWorkSet.isEmpty()) {
+            val first = labWorkSet.first()
+            labWorkSet.remove(first)
+            first
+        } else {
+            null
+        }
     }
 
-    /**
-     * Returns information about the collection, including its type, initialization date, and number of elements.
-     *
-     * @return A string containing the collection information.
-     */
     fun getInfo(): String {
-        return "Collection type: ${labWorkQueue::class.simpleName}\n" +
+        return "Collection type: ${labWorkSet::class.simpleName}\n" +
                 "Initialization date: ${getCreationDate()}\n" +
                 "Number of elements: ${size()}"
     }
 
-    /**
-     * Updates a LabWork object in the collection with the provided ID and new data.
-     *
-     * @param id The ID of the LabWork object to update.
-     * @param newLabWork The new LabWork object containing the updated data.
-     * @return True if the object was updated, false otherwise.
-     */
     fun update(id: Long, newLabWork: LabWork): Boolean {
-        val labWork = labWorkQueue.find { it.id == id }
-        return if (labWork != null) {
+
+        val labWork = labWorkSet.find { it.id == id }
+        if (labWork != null) {
             val updatedLabWork = LabWork(
                 id = labWork.id,
                 name = newLabWork.name,
@@ -184,16 +183,16 @@ class LabWorkCollection(private val fileName: String) {
                 minimalPoint = newLabWork.minimalPoint,
                 personalQualitiesMinimum = newLabWork.personalQualitiesMinimum,
                 difficulty = newLabWork.difficulty,
-                discipline = newLabWork.discipline
+                discipline = newLabWork.discipline,
+                owner = labWork.owner
             )
 
-            labWorkQueue.remove(labWork)
-            labWorkQueue.add(updatedLabWork)
+            labWorkSet.remove(labWork)
+            labWorkSet.add(updatedLabWork)
 
-            true
-        } else {
-            false
+            return true
         }
-    }
 
+        throw IllegalArgumentException("Cannot update a lab work that you did not create")
+    }
 }

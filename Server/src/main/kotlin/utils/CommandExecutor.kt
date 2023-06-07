@@ -1,5 +1,6 @@
 package utils
 
+import commandsForRegAndLogIn.*
 import commands.*
 import java.util.*
 
@@ -18,7 +19,6 @@ class CommandExecutor {
         commandMap["update"] = UpdateCommand()
         commandMap["remove_by_id"] = RemoveByIdCommand()
         commandMap["clear"] = ClearCommand()
-        commandMap["save"] = SaveCommand()
 //        commandMap["execute_script"] = ExecuteScriptCommand(this)
         commandMap["remove_first"] = RemoveFirstCommand()
         commandMap["remove_head"] = RemoveHeadCommand()
@@ -26,6 +26,8 @@ class CommandExecutor {
         commandMap["sum_of_minimal_point"] = SumOfMinimalPointCommand()
         commandMap["min_by_difficulty"] = MinByDifficultyCommand()
         commandMap["print_unique_minimal_point"] = PrintUniqueMinimalPointCommand()
+        commandMap["register"] = RegisterCommand()
+        commandMap["login"] = LoginCommand()
     }
 
 

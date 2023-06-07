@@ -17,7 +17,7 @@ class AddIfMaxCommand : Command() {
     override val commandType = CommandType.LABWORK_ARG
     override val commandArgs = listOf(CommandArgument("labWork", "LabWork"))
 
-    override fun execute(args: List<Any>): String {
+    override fun execute(args: List<Any>, token: String?): String {
         val labWorkJson = args[0] as String
         val labWork = Json.decodeFromString<LabWork>(labWorkJson)
         val added = labWorkCollection.addIfMax(labWork)

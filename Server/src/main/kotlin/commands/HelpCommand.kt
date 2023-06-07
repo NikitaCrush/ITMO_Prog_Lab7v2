@@ -2,7 +2,6 @@ package commands
 
 import commandArguments.CommandArgument
 import commandArguments.CommandType
-import kotlinx.serialization.Serializable
 import utils.CommandExecutor
 
 /**
@@ -33,7 +32,7 @@ class HelpCommand(private val commandExecutor: CommandExecutor) : Command() {
         "print_unique_minimal_point" to "print_unique_minimal_point : print the unique values of the minimalPoint field of all elements in the collection",
     )
 
-    override fun execute(args: List<Any>): String {
+    override fun execute(args: List<Any>, token: String?): String {
         val availableCommands = commandExecutor.getAvailableCommands()
         val helpText = StringBuilder()
 
