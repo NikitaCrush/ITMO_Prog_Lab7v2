@@ -8,16 +8,12 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.*
 import java.net.Socket
-import java.security.MessageDigest
 
 class ClientManager(private val host: String, private val port: Int) {
     private var socket: Socket? = null
     private var reader: BufferedReader? = null
     private var writer: PrintWriter? = null
     var commandList: Map<String, CommandType> = emptyMap()
-
-
-
 
     fun connect() {
         while (true) {
@@ -37,8 +33,6 @@ class ClientManager(private val host: String, private val port: Int) {
         }
     }
 
-
-
     fun disconnect() {
         reader?.close()
         writer?.close()
@@ -52,7 +46,6 @@ class ClientManager(private val host: String, private val port: Int) {
         writer?.flush()
     }
 
-
     fun receiveResponse(): Response {
         val serializedResponse = reader?.readLine()
         if (serializedResponse.isNullOrBlank()) {
@@ -60,12 +53,4 @@ class ClientManager(private val host: String, private val port: Int) {
         }
         return Json.decodeFromString(serializedResponse)
     }
-    private fun hashPassword(password: String): String {
-        val bytes = password.toByteArray()
-        val md = MessageDigest.getInstance("SHA-512")
-        val digest = md.digest(bytes)
-        return digest.fold("") { str, it -> str + "%02x".format(it) }
-    }
-
-
 }
