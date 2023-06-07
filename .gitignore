@@ -96,3 +96,6 @@ outTmp/
 kotlin-ide/
 coollection.json
 gradle\wraper
+/db_credentials.txt
+/collection.json
+/gradle/wrapper/gradle-wrapper.properties
