@@ -4,6 +4,9 @@ package data
  * An object that holds constant message strings for user prompts and errors.
  */
 object Messages {
+    const val REGISTRATION_SUCCESS = "  REGISTRATION_SUCCESS"
+    const val REGISTRATION_FAIL = "registration_fail"
+    const val LOGIN_FAIL = "login_fail"
     const val WELCOME = "Welcome to the LabWork Manager!"
     const val ENTER_HELP = "Enter 'help' for the list of available commands."
     const val ENTER_NAME = "Enter name: "
@@ -20,6 +23,6 @@ object Messages {
     const val ENTER_SELF_STUDY_HOURS = "Enter selfStudyHours: "
     const val LAB_WORK_SUCCESS_ADD = "Lab work added successfully."
     const val LAB_WORK_SUCCESS_CLEAR = "Lab work collection cleared successfully."
-    const val LAB_WORK_SUCCESS_SAVE = "Lab work collection saved successfully."
+//    const val LAB_WORK_SUCCESS_SAVE = "Lab work collection saved successfully."
     const val LAB_WORK_NOT_MAX = "The element is not the maximum and was not added to the collection."
 }
