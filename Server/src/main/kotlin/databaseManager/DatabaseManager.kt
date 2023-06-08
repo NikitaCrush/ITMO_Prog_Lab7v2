@@ -21,7 +21,7 @@ class DatabaseManager {
 //        }
     }
 
-    fun close() {
-        connection?.close()
-    }
+//    fun close() {
+//        connection?.close()
+//    }
 }

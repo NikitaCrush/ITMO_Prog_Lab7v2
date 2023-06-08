@@ -169,7 +169,7 @@ class LabWorkCollection {
         return false
     }
 
-    fun removeHead(owner: String): LabWork? {
+    fun removeHead(owner: String): LabWork {
         val labWork = labWorkSet.firstOrNull { it.owner == owner }
         if (labWork != null) {
             val connection = databaseManager.connection

@@ -13,7 +13,7 @@ class RemoveByIdCommand : Command() {
     override val commandArgs = listOf(CommandArgument("id", "String"))
 
     override fun execute(args: List<Any>, token: String?): String {
-        if (token == null || args.size < 1 || args[0] !is String) {
+        if (token == null || args.isEmpty() || args[0] !is String) {
             return "ID and/or token is not provided or has an incorrect format."
         }
 
@@ -27,11 +27,11 @@ class RemoveByIdCommand : Command() {
 
         val labWork = labWorkCollection.show().find { it.id == id && it.owner == owner }
 
-        if (labWork != null) {
+        return if (labWork != null) {
             labWorkCollection.removeById(id)
-            return "Lab work removed successfully."
+            "Lab work removed successfully."
         } else {
-            return "No lab work found with the provided id that belongs to the current user."
+            "No lab work found with the provided id that belongs to the current user."
         }
     }
 }

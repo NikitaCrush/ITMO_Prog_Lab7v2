@@ -37,11 +37,11 @@ class UpdateCommand : Command() {
 
         val labWorkToUpdate = labWorkCollection.show().find { it.id == id && it.owner == owner }
 
-        if (labWorkToUpdate != null) {
+        return if (labWorkToUpdate != null) {
             labWorkCollection.update(id, updatedLabWork)
-            return "Lab work with ID: $id has been updated."
+            "Lab work with ID: $id has been updated."
         } else {
-            return "No lab work found with ID: $id that belongs to the current user."
+            "No lab work found with ID: $id that belongs to the current user."
         }
     }
 }
