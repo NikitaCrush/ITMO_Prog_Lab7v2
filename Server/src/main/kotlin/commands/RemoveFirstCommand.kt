@@ -13,7 +13,7 @@ class RemoveFirstCommand : Command() {
     override val commandArgs = emptyList<CommandArgument>()
 
     override fun execute(args: List<Any>, token: String?): String {
-        labWorkCollection.removeFirst()
+        labWorkCollection.removeFirst(token!!)
         return "First element removed successfully."
     }
 }

@@ -14,6 +14,7 @@ class ClientManager(private val host: String, private val port: Int) {
     private var reader: BufferedReader? = null
     private var writer: PrintWriter? = null
     var commandList: Map<String, CommandType> = emptyMap()
+    var token: String? = null
 
     fun connect() {
         while (true) {
@@ -51,6 +52,19 @@ class ClientManager(private val host: String, private val port: Int) {
         if (serializedResponse.isNullOrBlank()) {
             throw IllegalStateException("No response received from the server.")
         }
-        return Json.decodeFromString(serializedResponse)
+        val response = Json.decodeFromString<Response>(serializedResponse)
+
+        // Handle the token for a successful login.
+        if (response.message.startsWith("log in successful, your token is: ")) {
+            val token = response.message.substringAfter("log in successful, your token is: ")
+            // Notify the CommandInterpreter about the received token.
+            receiveToken(token)
+            // Remove the token from the message before returning the response.
+        }
+
+        return response
+    }
+    private fun receiveToken(token: String) {
+        this.token = token
     }
 }

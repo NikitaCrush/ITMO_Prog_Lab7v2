@@ -12,6 +12,7 @@ class UserCollection(private val dbManager: DatabaseManager) {
 
     private val secretKey = System.getenv("SECRET_KEY")
 
+
     fun register(username: String, hashedPassword: String): Boolean {
         val connection = dbManager.connection
         val preparedStatement = connection?.prepareStatement("INSERT INTO Users (username, password_hash) VALUES (?, ?)")
@@ -50,7 +51,7 @@ class UserCollection(private val dbManager: DatabaseManager) {
                 jws.key = HmacKey(secretKey.toByteArray())
                 jws.algorithmHeaderValue = AlgorithmIdentifiers.HMAC_SHA256
 
-                val token = jws.compactSerialization.let {}
+                val token = jws.compactSerialization
 
                 return ("log in successful, your token is: $token")
             }

@@ -13,6 +13,6 @@ class RemoveHeadCommand : Command() {
     override val commandArgs = emptyList<CommandArgument>()
 
     override fun execute(args: List<Any>, token: String?): String {
-        return labWorkCollection.removeHead().toString()
+        return labWorkCollection.removeHead(token!!).toString()
     }
 }

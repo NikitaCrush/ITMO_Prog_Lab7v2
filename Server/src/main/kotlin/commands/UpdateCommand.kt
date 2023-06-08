@@ -16,10 +16,10 @@ import kotlinx.serialization.json.Json
 
 class UpdateCommand : Command() {
     override val commandType = CommandType.ARG_AND_LABWORK
-    override val commandArgs = listOf(CommandArgument("id", "String"), CommandArgument("labwork", "LabWork"), CommandArgument("token", "String"))
+    override val commandArgs = listOf(CommandArgument("id", "String"), CommandArgument("labwork", "LabWork"))
 
     override fun execute(args: List<Any>, token: String?): String {
-        if (args.size < 3 || args[0] !is String) {
+        if (token == null || args.size < 2 || args[0] !is String) {
             return "ID, LabWork object and/or token is not provided or has an incorrect format."
         }
 
@@ -32,15 +32,16 @@ class UpdateCommand : Command() {
         val labWorkJson = args[1] as String
         val updatedLabWork = Json.decodeFromString<LabWork>(labWorkJson)
 
+        val owner = userCollection.validateToken(token)
+            ?: throw IllegalArgumentException("Invalid token.")
 
+        val labWorkToUpdate = labWorkCollection.show().find { it.id == id && it.owner == owner }
 
-        val labWorkToUpdate = labWorkCollection.show().find { it.id == id }
-
-        return if (labWorkToUpdate != null) {
+        if (labWorkToUpdate != null) {
             labWorkCollection.update(id, updatedLabWork)
-            "Lab work with ID: $id has been updated."
+            return "Lab work with ID: $id has been updated."
         } else {
-            "No lab work found with ID: $id."
+            return "No lab work found with ID: $id that belongs to the current user."
         }
     }
 }

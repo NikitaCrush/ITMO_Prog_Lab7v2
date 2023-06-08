@@ -14,7 +14,6 @@ class CommandInterpreter(
     private val profileReader: ProfileReader
 ) {
     private var loggedInUser: String? = null
-    private var token: String? = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InZydnIiLCJleHAiOjE2ODYxNjk0Mjl9.G-7nTLBp5rYsEdzddinDEnPms5OswRjjgPy4NuT8-nY"
 
 
     fun interpret(input: String): Pair<CommandData, List<CommandArgument>> {
@@ -74,12 +73,13 @@ class CommandInterpreter(
                 val serializedUser = getSerializedUser()
 
                 listOf(CommandArgument("login", "User", serializedUser))
+
             }
 
             else -> throw IllegalArgumentException("Command type not supported.")
         }
 
-        return Pair(CommandData(commandName, arguments, token), arguments)
+        return Pair(CommandData(commandName, arguments, clientManager.token), arguments)
     }
 
     private fun findCommandType(commandName: String): CommandType? {

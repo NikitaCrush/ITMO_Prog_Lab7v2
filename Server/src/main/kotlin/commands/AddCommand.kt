@@ -21,12 +21,12 @@ class AddCommand : Command() {
             throw IllegalArgumentException("Add command expects 1 argument, but got none.")
         }
 
-        val token = args.find { it is CommandArgument && it.name == "token" } as? String
-            ?: throw IllegalArgumentException("No token provided.")
+        if (token == null) {
+            throw IllegalArgumentException("No token provided.")
+        }
 
         val owner = userCollection.validateToken(token)
             ?: throw IllegalArgumentException("Invalid token.")
-
 
         val labWorkJson = args[0] as? String
             ?: throw IllegalArgumentException("Argument for add command is not of type String.")
@@ -36,5 +36,4 @@ class AddCommand : Command() {
         labWorkCollection.add(labWork)
         return Messages.LAB_WORK_SUCCESS_ADD
     }
-
 }

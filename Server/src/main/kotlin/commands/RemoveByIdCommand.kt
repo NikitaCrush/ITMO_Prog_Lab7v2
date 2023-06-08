@@ -10,10 +10,10 @@ import commandArguments.CommandType
  */
 class RemoveByIdCommand : Command() {
     override val commandType = CommandType.SINGLE_ARG
-    override val commandArgs = listOf(CommandArgument("id", "String"), CommandArgument("token", "String"))
+    override val commandArgs = listOf(CommandArgument("id", "String"))
 
     override fun execute(args: List<Any>, token: String?): String {
-        if (args.size < 2 || args[0] !is String) {
+        if (token == null || args.size < 1 || args[0] !is String) {
             return "ID and/or token is not provided or has an incorrect format."
         }
 
@@ -22,14 +22,16 @@ class RemoveByIdCommand : Command() {
         } catch (e: NumberFormatException) {
             return "Invalid ID format. Please enter a valid number."
         }
+        val owner = userCollection.validateToken(token)
+            ?: throw IllegalArgumentException("Invalid token.")
 
+        val labWork = labWorkCollection.show().find { it.id == id && it.owner == owner }
 
-
-        val removed = labWorkCollection.removeById(id)
-        return if (removed) {
-            "Lab work removed successfully."
+        if (labWork != null) {
+            labWorkCollection.removeById(id)
+            return "Lab work removed successfully."
         } else {
-            "No lab work found with the provided id."
+            return "No lab work found with the provided id that belongs to the current user."
         }
     }
 }

@@ -14,9 +14,7 @@ class ClearCommand : Command() {
     override val commandArgs = emptyList<CommandArgument>()
 
     override fun execute(args: List<Any>, token: String?): String {
-        labWorkCollection.clear()
+        labWorkCollection.clear(token!!)
         return Messages.LAB_WORK_SUCCESS_CLEAR
     }
-
-
 }

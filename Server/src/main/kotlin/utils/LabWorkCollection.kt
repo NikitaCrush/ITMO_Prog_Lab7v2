@@ -94,26 +94,31 @@ class LabWorkCollection {
 
 
     fun removeById(id: Long): Boolean {
-
         val labWork = labWorkSet.find { it.id == id }
         if (labWork != null) {
             val connection = databaseManager.connection
-            val preparedStatement = connection?.prepareStatement("DELETE FROM LabWorks WHERE id = ?")
+            val preparedStatement = connection?.prepareStatement("DELETE FROM LabWorks2 WHERE id = ?")
 
             preparedStatement?.setLong(1, id)
 
-            preparedStatement?.executeUpdate()
+            val rowsAffected = preparedStatement?.executeUpdate() ?: 0
 
-            databaseManager.close()
-
-            return labWorkSet.removeIf { it.id == id }
+            if (rowsAffected > 0) {
+                return labWorkSet.removeIf { it.id == id }
+            }
         }
-
         throw IllegalArgumentException("Cannot remove a lab work that you did not create")
     }
 
-    fun clear() {
-        labWorkSet.clear()
+    fun clear(token: String) {
+        val connection = databaseManager.connection
+        val preparedStatement = connection?.prepareStatement("DELETE FROM LabWorks2 WHERE owner = ?")
+
+        preparedStatement?.setString(1, token)
+
+        preparedStatement?.executeUpdate()
+
+        labWorkSet.removeIf { it.owner == token }
     }
 
     fun show(): List<LabWork> {
@@ -128,9 +133,17 @@ class LabWorkCollection {
         return LocalDate.now()
     }
 
-    fun removeFirst() {
-        if (!labWorkSet.isEmpty()) {
-            labWorkSet.remove(labWorkSet.first())
+    fun removeFirst(token: String) {
+        val labWork = labWorkSet.firstOrNull { it.owner == token }
+        if (labWork != null) {
+            val connection = databaseManager.connection
+            val preparedStatement = connection?.prepareStatement("DELETE FROM LabWorks2 WHERE id = ?")
+
+            preparedStatement?.setLong(1, labWork.id)
+
+            preparedStatement?.executeUpdate()
+
+            labWorkSet.remove(labWork)
         }
     }
 
@@ -147,22 +160,30 @@ class LabWorkCollection {
     }
 
     fun addIfMax(labWork: LabWork): Boolean {
-        val maxLabWork = labWorkSet.maxWithOrNull(compareBy { it.id })
+        if (labWorkSet.none { it.owner == labWork.owner }) return false
+
+        val maxLabWork = labWorkSet.filter { it.owner == labWork.owner }.maxWithOrNull(compareBy { it.id })
         if (maxLabWork == null || compareBy<LabWork> { it.id }.compare(maxLabWork, labWork) < 0) {
-            labWorkSet.add(labWork)
+            add(labWork)  // Make sure to catch potential IllegalStateException here
             return true
         }
         return false
     }
 
-    fun removeHead(): LabWork? {
-        return if (!labWorkSet.isEmpty()) {
-            val first = labWorkSet.first()
-            labWorkSet.remove(first)
-            first
-        } else {
-            null
+    fun removeHead(token: String): LabWork? {
+        val labWork = labWorkSet.firstOrNull { it.owner == token }
+        if (labWork != null) {
+            val connection = databaseManager.connection
+            val preparedStatement = connection?.prepareStatement("DELETE FROM LabWorks2 WHERE id = ?")
+
+            preparedStatement?.setLong(1, labWork.id)
+
+            preparedStatement?.executeUpdate()
+
+            labWorkSet.remove(labWork)
+            return labWork
         }
+        return null
     }
 
     fun getInfo(): String {
@@ -172,9 +193,9 @@ class LabWorkCollection {
     }
 
     fun update(id: Long, newLabWork: LabWork): Boolean {
-
         val labWork = labWorkSet.find { it.id == id }
-        if (labWork != null) {
+
+        if (labWork != null && labWork.owner == newLabWork.owner) {
             val updatedLabWork = LabWork(
                 id = labWork.id,
                 name = newLabWork.name,
@@ -187,12 +208,39 @@ class LabWorkCollection {
                 owner = labWork.owner
             )
 
-            labWorkSet.remove(labWork)
-            labWorkSet.add(updatedLabWork)
+            val connection = databaseManager.connection
+            val preparedStatement = connection?.prepareStatement("""
+            UPDATE LabWorks2 SET 
+            name = ?, 
+            coordinate_x = ?, 
+            coordinate_y = ?, 
+            minimalPoint = ?, 
+            personalQualitiesMinimum = ?, 
+            difficulty = ?, 
+            discipline_name = ?, 
+            discipline_selfStudyHours = ? 
+            WHERE id = ?;
+        """)
 
-            return true
+            preparedStatement?.setString(1, updatedLabWork.name)
+            preparedStatement?.setLong(2, updatedLabWork.coordinates.x)
+            preparedStatement?.setDouble(3, updatedLabWork.coordinates.y)
+            preparedStatement?.setInt(4, updatedLabWork.minimalPoint)
+            preparedStatement?.setInt(5, updatedLabWork.personalQualitiesMinimum)
+            preparedStatement?.setString(6, updatedLabWork.difficulty?.name)
+            preparedStatement?.setString(7, updatedLabWork.discipline.name)
+            preparedStatement?.setLong(8, updatedLabWork.discipline.selfStudyHours)
+            preparedStatement?.setLong(9, updatedLabWork.id)
+
+            val rowsAffected = preparedStatement?.executeUpdate() ?: 0
+
+            if (rowsAffected > 0) {
+                labWorkSet.remove(labWork)
+                labWorkSet.add(updatedLabWork)
+                return true
+            }
         }
-
         throw IllegalArgumentException("Cannot update a lab work that you did not create")
     }
+
 }

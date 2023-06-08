@@ -7,6 +7,5 @@ import kotlinx.serialization.Serializable
 data class CommandData(
     val commandName: String,
     val arguments: List<CommandArgument> = emptyList(),
-    val token: String? = null
-
+    var token: String? = null
 )

@@ -20,10 +20,8 @@ class AddIfMaxCommand : Command() {
     override fun execute(args: List<Any>, token: String?): String {
         val labWorkJson = args[0] as String
         val labWork = Json.decodeFromString<LabWork>(labWorkJson)
+        labWork.owner = token!!
         val added = labWorkCollection.addIfMax(labWork)
         return if (added) Messages.LAB_WORK_SUCCESS_ADD else Messages.LAB_WORK_NOT_MAX
     }
-
-
-
 }
