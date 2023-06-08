@@ -43,6 +43,9 @@ fun main() {
         } catch (e: IllegalArgumentException) {
             println(e.message)
         }
+        catch (e: IllegalStateException) {
+            println(e.message)
+        }
     }
     clientManager.disconnect()
 }
