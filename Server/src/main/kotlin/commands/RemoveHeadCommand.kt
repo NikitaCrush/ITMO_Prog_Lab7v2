@@ -13,6 +13,14 @@ class RemoveHeadCommand : Command() {
     override val commandArgs = emptyList<CommandArgument>()
 
     override fun execute(args: List<Any>, token: String?): String {
-        return labWorkCollection.removeHead(token!!).toString()
+        if (token == null) {
+            throw IllegalArgumentException("No token provided.")
+        }
+
+        val owner = userCollection.validateToken(token)
+            ?: throw IllegalArgumentException("Invalid token.")
+
+        return labWorkCollection.removeHead(owner).toString()
     }
+
 }

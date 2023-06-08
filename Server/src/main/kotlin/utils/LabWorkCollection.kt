@@ -43,7 +43,6 @@ class LabWorkCollection {
         }
 
     }
-//eyJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InZydnIiLCJleHAiOjE2ODYxNjkzOTh9.m6Anf-Pce1ZYxe9zN4Bl1eYMFzvOaLG9q4cXojpILQg
 
     fun add(labWork: LabWork): String {
 
@@ -90,9 +89,6 @@ class LabWorkCollection {
     }
 
 
-
-
-
     fun removeById(id: Long): Boolean {
         val labWork = labWorkSet.find { it.id == id }
         if (labWork != null) {
@@ -110,16 +106,17 @@ class LabWorkCollection {
         throw IllegalArgumentException("Cannot remove a lab work that you did not create")
     }
 
-    fun clear(token: String) {
+    fun clear(owner: String) {
         val connection = databaseManager.connection
         val preparedStatement = connection?.prepareStatement("DELETE FROM LabWorks2 WHERE owner = ?")
 
-        preparedStatement?.setString(1, token)
+        preparedStatement?.setString(1, owner)
 
         preparedStatement?.executeUpdate()
 
-        labWorkSet.removeIf { it.owner == token }
+        labWorkSet.removeIf { it.owner == owner }
     }
+
 
     fun show(): List<LabWork> {
         return labWorkSet.toList()
@@ -133,8 +130,8 @@ class LabWorkCollection {
         return LocalDate.now()
     }
 
-    fun removeFirst(token: String) {
-        val labWork = labWorkSet.firstOrNull { it.owner == token }
+    fun removeFirst(owner: String) {
+        val labWork = labWorkSet.firstOrNull { it.owner == owner }
         if (labWork != null) {
             val connection = databaseManager.connection
             val preparedStatement = connection?.prepareStatement("DELETE FROM LabWorks2 WHERE id = ?")
@@ -144,6 +141,8 @@ class LabWorkCollection {
             preparedStatement?.executeUpdate()
 
             labWorkSet.remove(labWork)
+        } else {
+            throw IllegalArgumentException("No elements found owned by the provided owner.")
         }
     }
 
@@ -170,8 +169,8 @@ class LabWorkCollection {
         return false
     }
 
-    fun removeHead(token: String): LabWork? {
-        val labWork = labWorkSet.firstOrNull { it.owner == token }
+    fun removeHead(owner: String): LabWork? {
+        val labWork = labWorkSet.firstOrNull { it.owner == owner }
         if (labWork != null) {
             val connection = databaseManager.connection
             val preparedStatement = connection?.prepareStatement("DELETE FROM LabWorks2 WHERE id = ?")
@@ -182,8 +181,9 @@ class LabWorkCollection {
 
             labWorkSet.remove(labWork)
             return labWork
+        } else {
+            throw IllegalArgumentException("No elements found owned by the provided owner.")
         }
-        return null
     }
 
     fun getInfo(): String {

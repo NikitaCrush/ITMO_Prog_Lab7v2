@@ -14,7 +14,15 @@ class ClearCommand : Command() {
     override val commandArgs = emptyList<CommandArgument>()
 
     override fun execute(args: List<Any>, token: String?): String {
-        labWorkCollection.clear(token!!)
+        if (token == null) {
+            throw IllegalArgumentException("No token provided.")
+        }
+
+        val owner = userCollection.validateToken(token)
+            ?: throw IllegalArgumentException("Invalid token.")
+
+        labWorkCollection.clear(owner)
         return Messages.LAB_WORK_SUCCESS_CLEAR
     }
+
 }

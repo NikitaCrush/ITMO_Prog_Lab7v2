@@ -11,10 +11,13 @@ import kotlinx.coroutines.*
 import java.util.concurrent.Executors
 import commandArguments.*
 
-class ServerManager(private val port: Int) {
+class ServerManager(
+    private val port: Int
+) {
     private var serverSocket: ServerSocket? = null
     private var commandExecutor: CommandExecutor? = null
     private val requestExecutor = Executors.newCachedThreadPool()
+
 
     fun startServer(commandExecutor: CommandExecutor) = runBlocking {
         this@ServerManager.commandExecutor = commandExecutor
@@ -31,12 +34,6 @@ class ServerManager(private val port: Int) {
             }
         }
     }
-
-//    fun stopServer() {
-//        serverSocket?.close()
-//        requestExecutor.shutdown()
-//        responseExecutor.shutdown()
-//    }
 
     private fun handleCommands(clientSocket: Socket) {
         val reader = BufferedReader(InputStreamReader(clientSocket.getInputStream()))
@@ -56,15 +53,11 @@ class ServerManager(private val port: Int) {
         }
     }
 
-
     private fun sendAvailableCommands(writer: PrintWriter) {
         val commandMap = commandExecutor?.getAvailableCommands()?.map { it.key to it.value.commandType }?.toMap()
         writer.println(Json.encodeToString(commandMap))
         writer.flush()
     }
-
-
-
 
     private fun processClientCommand(reader: BufferedReader, writer: PrintWriter) {
         val commandData = receiveCommandData(reader)
@@ -78,15 +71,14 @@ class ServerManager(private val port: Int) {
     }
 
     private fun executeCommand(commandData: CommandData): Response {
-        val command = commandExecutor?.getCommand(commandData.commandName) ?: return Response(false, "Command not found: ${commandData.commandName}")
-
-        return try {
-            val responseMessage = command.execute(commandData.arguments.map { it.value!! })  // Assuming the execute() method returns a response message.
-            Response(true, responseMessage)
-        } catch (e: Exception) {
-            Response(false, "Error executing command: ${e.message}")
-        }
+        val command = commandExecutor?.getCommand(commandData.commandName) ?: return Response(
+            false,
+            "Command not found: ${commandData.commandName}"
+        )
+        val responseMessage = command.execute(commandData.arguments.map { it.value!! }, commandData.token)
+        return Response(true, responseMessage)
     }
+
 
     private fun sendResponse(response: Response, writer: PrintWriter) {
         val serializedResponse = Json.encodeToString(response)
@@ -94,8 +86,15 @@ class ServerManager(private val port: Int) {
         writer.flush()
     }
 
-    private fun closeClientConnection(clientSocket: Socket) {
-        println("Closing client connection...")
-        clientSocket.close()
-    }
+//    fun stopServer() {
+//        serverSocket?.close()
+//        requestExecutor.shutdown()
+//        responseExecutor.shutdown()
+//    }
+
+//    private fun closeClientConnection(clientSocket: Socket) {
+//        println("Closing client connection...")
+//        clientSocket.close()
+//    }
+
 }

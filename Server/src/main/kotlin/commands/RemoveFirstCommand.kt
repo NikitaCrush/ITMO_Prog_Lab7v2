@@ -13,7 +13,15 @@ class RemoveFirstCommand : Command() {
     override val commandArgs = emptyList<CommandArgument>()
 
     override fun execute(args: List<Any>, token: String?): String {
-        labWorkCollection.removeFirst(token!!)
+        if (token == null) {
+            throw IllegalArgumentException("No token provided.")
+        }
+
+        val owner = userCollection.validateToken(token)
+            ?: throw IllegalArgumentException("Invalid token.")
+
+        labWorkCollection.removeFirst(owner)
         return "First element removed successfully."
     }
+
 }
