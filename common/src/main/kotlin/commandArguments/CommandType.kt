@@ -9,5 +9,6 @@ enum class CommandType {
     LABWORK_ARG,
     ARG_AND_LABWORK,
     USER_REGISTRATION,
-    USER_LOGIN
+    USER_LOGIN,
+    USER_LOGOUT
 }

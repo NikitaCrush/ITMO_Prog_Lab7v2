@@ -28,6 +28,7 @@ class CommandExecutor {
         commandMap["print_unique_minimal_point"] = PrintUniqueMinimalPointCommand()
         commandMap["register"] = RegisterCommand()
         commandMap["login"] = LoginCommand()
+        commandMap["logout"] = LogoutCommand()
     }
 
 

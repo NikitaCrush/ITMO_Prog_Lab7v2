@@ -60,6 +60,14 @@ class CommandInterpreter(
                 val serializedUser = getSerializedUser()
                 listOf(CommandArgument("login", "User", serializedUser))
             }
+            CommandType.USER_LOGOUT -> {
+                requireLoggedIn()
+                // Clear logged in user
+                loggedInUser = null
+                // Clear client token
+                clientManager.token = null
+                emptyList()
+            }
 
             else -> throw IllegalArgumentException("Command type not supported.")
         }
