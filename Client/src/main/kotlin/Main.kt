@@ -9,13 +9,14 @@ fun main() {
     val validator = Validator()
     val labWorkReader = LabWorkReader({ readlnOrNull() ?: throw IllegalStateException("No input provided") }, validator)
     val profileReader = ProfileReader()
-
-    // Initialize the ClientManager
+    // Initialize the clientManager
     val clientManager = ClientManager("localhost", 12345)
-    clientManager.connect()
 
     // Initialize the command interpreter
     val commandInterpreter = CommandInterpreter(labWorkReader, clientManager, profileReader)
+    clientManager.setCommandInterpreter(commandInterpreter)
+    clientManager.connect()
+
     println(Messages.WELCOME)
     println(Messages.ENTER_HELP)
 
@@ -29,6 +30,12 @@ fun main() {
 
         try {
             val (commandData, _) = commandInterpreter.interpret(input)
+
+            if (commandData.commandName != "register" && commandData.commandName != "login" && clientManager.token == null) {
+                println("Please login before executing commands.")
+                continue
+            }
+
             val task = Task(commandData)
 
             commandData.arguments.forEach { argument ->
@@ -42,8 +49,7 @@ fun main() {
             println(response.message)
         } catch (e: IllegalArgumentException) {
             println(e.message)
-        }
-        catch (e: IllegalStateException) {
+        } catch (e: IllegalStateException) {
             println(e.message)
         }
     }

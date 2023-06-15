@@ -23,7 +23,8 @@ class LoginCommand : Command() {
 
         val deserializedUser: User = Json.decodeFromString(user)
 
-        return userCollection.login(deserializedUser.username, deserializedUser.password) ?: Messages.LOGIN_FAIL
+        val loginResult = userCollection.login(deserializedUser.username, deserializedUser.password)
+        return loginResult ?: Messages.LOGIN_FAIL
     }
 }
 

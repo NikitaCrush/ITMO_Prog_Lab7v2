@@ -3,6 +3,7 @@ package client
 import commandArguments.CommandData
 import commandArguments.CommandType
 import commandArguments.Response
+import data.Messages
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -15,6 +16,8 @@ class ClientManager(private val host: String, private val port: Int) {
     private var writer: PrintWriter? = null
     var commandList: Map<String, CommandType> = emptyMap()
     var token: String? = null
+    private var commandInterpreter: CommandInterpreter? = null
+
 
     fun connect() {
         while (true) {
@@ -60,11 +63,22 @@ class ClientManager(private val host: String, private val port: Int) {
             // Notify the CommandInterpreter about the received token.
             receiveToken(token)
             // Remove the token from the message before returning the response.
+        } else if (response.message == Messages.LOGIN_FAIL || response.message == Messages.REGISTRATION_FAIL) {
+            // Notify the CommandInterpreter about the failed login or registration.
+            failedLoginOrRegistration()
         }
 
         return response
     }
-    private fun receiveToken(token: String) {
+    fun receiveToken(token: String) {
         this.token = token
+    }
+    fun setCommandInterpreter(commandInterpreter: CommandInterpreter) {
+        this.commandInterpreter = commandInterpreter
+    }
+
+    fun failedLoginOrRegistration() {
+        commandInterpreter?.failedLoginOrRegistration()
+        this.token = null
     }
 }

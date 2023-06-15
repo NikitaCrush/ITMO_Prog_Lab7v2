@@ -15,7 +15,6 @@ class CommandInterpreter(
 ) {
     private var loggedInUser: String? = null
 
-
     fun interpret(input: String): Pair<CommandData, List<CommandArgument>> {
         val commandParts = input.split(" ")
         val commandName = commandParts[0]
@@ -24,62 +23,52 @@ class CommandInterpreter(
 
         val arguments = when (commandType) {
             CommandType.NO_ARG -> {
-                if (loggedInUser == null) {
-                    throw IllegalStateException("User must be logged in to perform this action.")
-                }
-                emptyList()}
+                requireLoggedIn()
+                emptyList()
+            }
+
             CommandType.SINGLE_ARG -> {
-                if (loggedInUser == null) {
-                    throw IllegalStateException("User must be logged in to perform this action.")
-                }
-                if (parameters.isEmpty()) {
-                    throw IllegalArgumentException("A parameter is required for this command.")
-                }
+                requireLoggedIn()
+                requireParameter(parameters)
                 listOf(CommandArgument("arg", "String", parameters[0]))
             }
+
             CommandType.LABWORK_ARG -> {
-                if (loggedInUser == null) {
-                    throw IllegalStateException("User must be logged in to perform this action.")
-                }
+                requireLoggedIn()
                 val serializedLabWork = getSerializedLabWork()
                 listOf(CommandArgument("labWork", "LabWork", serializedLabWork))
             }
+
             CommandType.ARG_AND_LABWORK -> {
-                if (loggedInUser == null) {
-                    throw IllegalStateException("User must be logged in to perform this action.")
-                }
-                if (parameters.isEmpty()) {
-                    throw IllegalArgumentException("A parameter is required for this command.")
-                }
+                requireLoggedIn()
+                requireParameter(parameters)
                 val serializedLabWork = getSerializedLabWork()
                 listOf(
                     CommandArgument("arg", "String", parameters[0]),
                     CommandArgument("labWork", "LabWork", serializedLabWork)
                 )
             }
-            CommandType.USER_REGISTRATION -> {
-                if (loggedInUser != null) {
-                    throw IllegalStateException("Already logged in. Please log out before registering a new user.")
-                }
-                val serializedUser = getSerializedUser()
 
+            CommandType.USER_REGISTRATION -> {
+                requireLoggedOut()
+                val serializedUser = getSerializedUser()
                 listOf(CommandArgument("reg", "User", serializedUser))
             }
 
             CommandType.USER_LOGIN -> {
-                if (loggedInUser != null) {
-                    throw IllegalStateException("Already logged in. Please log out before logging in again.")
-                }
+                requireLoggedOut()
                 val serializedUser = getSerializedUser()
-
                 listOf(CommandArgument("login", "User", serializedUser))
-
             }
 
             else -> throw IllegalArgumentException("Command type not supported.")
         }
 
         return Pair(CommandData(commandName, arguments, clientManager.token), arguments)
+    }
+
+    fun failedLoginOrRegistration() {
+        loggedInUser = null
     }
 
     private fun findCommandType(commandName: String): CommandType? {
@@ -99,24 +88,21 @@ class CommandInterpreter(
         return Json.encodeToString(user)
     }
 
+    private fun requireLoggedIn() {
+        if (loggedInUser == null) {
+            throw IllegalStateException("User must be logged in to perform this action.")
+        }
+    }
+
+    private fun requireLoggedOut() {
+        if (loggedInUser != null) {
+            throw IllegalStateException("Already logged in. Please log out before logging in again.")
+        }
+    }
+
+    private fun requireParameter(parameters: List<String>) {
+        if (parameters.isEmpty()) {
+            throw IllegalArgumentException("A parameter is required for this command.")
+        }
+    }
 }
-
-
-//
-//private fun handleCommands(clientSocket: Socket) {
-//    val reader = BufferedReader(InputStreamReader(clientSocket.getInputStream()))
-//    val writer = PrintWriter(BufferedWriter(OutputStreamWriter(clientSocket.getOutputStream())))
-//
-//    // Send the list of commands to the client
-//    sendAvailableCommands(writer)
-//
-//    // Process commands from the client
-//    while (true) {
-//        try {
-//            processClientCommand(reader, writer)
-//        } catch (e: Exception) {
-//            // Send error response back to client
-//            sendResponse(Response(false, "Error processing command: ${e.message}"), writer)
-//        }
-//    }
-//}
