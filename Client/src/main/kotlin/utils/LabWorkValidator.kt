@@ -7,7 +7,7 @@ import exeptions.ValidationException
 /**
  * Class responsible for validating the input data for LabWork instances.
  */
-class Validator {
+class LabWorkValidator {
     /**
      * Validates the name of a LabWork instance.
      *

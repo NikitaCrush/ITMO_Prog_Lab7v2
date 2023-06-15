@@ -1,13 +1,13 @@
 import utils.LabWorkReader
-import utils.Validator
+import utils.LabWorkValidator
 import client.*
 import data.Messages
 import utils.ProfileReader
 
 fun main() {
     // Initialize required instances
-    val validator = Validator()
-    val labWorkReader = LabWorkReader({ readlnOrNull() ?: throw IllegalStateException("No input provided") }, validator)
+    val labWorkValidator = LabWorkValidator()
+    val labWorkReader = LabWorkReader({ readlnOrNull() ?: throw IllegalStateException("No input provided") }, labWorkValidator)
     val profileReader = ProfileReader()
     // Initialize the clientManager
     val clientManager = ClientManager("localhost", 12345)

@@ -9,9 +9,9 @@ import java.util.*
  * A class for reading LabWork instances from user input.
  *
  * @param readLineFn A function to read user input.
- * @param validator A Validator instance to validate user input.
+ * @param labWorkValidator A Validator instance to validate user input.
  */
-class LabWorkReader(private val readLineFn: () -> String, private val validator: Validator) {
+class LabWorkReader(private val readLineFn: () -> String, private val labWorkValidator: LabWorkValidator) {
 
     /**
      * Reads and validates the name of a LabWork object from user input.
@@ -23,7 +23,7 @@ class LabWorkReader(private val readLineFn: () -> String, private val validator:
             print(Messages.ENTER_NAME)
             val name = readLineFn()
             try {
-                validator.validateName(name)
+                labWorkValidator.validateName(name)
                 return name
             } catch (e: ValidationException) {
                 println(e.message)
@@ -44,7 +44,7 @@ class LabWorkReader(private val readLineFn: () -> String, private val validator:
                 print(Messages.ENTER_Y)
                 val y = readLineFn().trim().toDouble()
                 val coordinates = Coordinates(x, y)
-                validator.validateCoordinates(coordinates)
+                labWorkValidator.validateCoordinates(coordinates)
                 return coordinates
             } catch (e: NumberFormatException) {
                 println(Messages.INVALID_COORDINATES)
@@ -60,7 +60,7 @@ class LabWorkReader(private val readLineFn: () -> String, private val validator:
      * @return A valid minimal point value.
      */
     private fun readMinimalPoint(): Int {
-        return readInt(Messages.ENTER_MINIMAL_POINT, readLineFn, validator::validateMinimalPoint)
+        return readInt(Messages.ENTER_MINIMAL_POINT, readLineFn, labWorkValidator::validateMinimalPoint)
     }
 
     /**
@@ -98,8 +98,8 @@ class LabWorkReader(private val readLineFn: () -> String, private val validator:
                 val disciplineName = disciplineInput[0]
                 val selfStudyHours = readSelfStudyHours()
                 val discipline = Discipline(disciplineName, selfStudyHours)
-                validator.validateDiscipline(discipline)
-                validator.validateSelfStudyHours(selfStudyHours)
+                labWorkValidator.validateDiscipline(discipline)
+                labWorkValidator.validateSelfStudyHours(selfStudyHours)
                 return discipline
             } catch (e: Exception) {
                 println(Messages.INVALID_DISCIPLINE)
@@ -146,7 +146,7 @@ class LabWorkReader(private val readLineFn: () -> String, private val validator:
      * @return A valid personal qualities minimum value.
      */
     private fun readPersonalQualitiesMinimum(): Int {
-        return readInt(Messages.ENTER_PERSONAL_QUALITIES_MIN, readLineFn, validator::validatePersonalQualitiesMinimum)
+        return readInt(Messages.ENTER_PERSONAL_QUALITIES_MIN, readLineFn, labWorkValidator::validatePersonalQualitiesMinimum)
     }
 
     /**
@@ -200,6 +200,6 @@ class LabWorkReader(private val readLineFn: () -> String, private val validator:
      * @return A valid self-study hours value.
      */
     private fun readSelfStudyHours(): Long {
-        return readLong(readLineFn, validator::validateSelfStudyHours)
+        return readLong(readLineFn, labWorkValidator::validateSelfStudyHours)
     }
 }
