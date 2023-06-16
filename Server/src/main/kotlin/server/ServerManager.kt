@@ -81,10 +81,15 @@ class ServerManager(
 
 
     private fun sendResponse(response: Response, writer: PrintWriter) {
-        val serializedResponse = Json.encodeToString(response)
-        writer.println(serializedResponse)
-        writer.flush()
+        responseExecutor.execute {
+            val serializedResponse = Json.encodeToString(response)
+            writer.println(serializedResponse)
+            writer.flush()
+        }
     }
+
+    private val responseExecutor = Executors.newFixedThreadPool(10) // set the thread pool size as needed
+
 
 //    fun stopServer() {
 //        serverSocket?.close()

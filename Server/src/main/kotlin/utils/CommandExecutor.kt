@@ -19,7 +19,6 @@ class CommandExecutor {
         commandMap["update"] = UpdateCommand()
         commandMap["remove_by_id"] = RemoveByIdCommand()
         commandMap["clear"] = ClearCommand()
-//        commandMap["execute_script"] = ExecuteScriptCommand(this)
         commandMap["remove_first"] = RemoveFirstCommand()
         commandMap["remove_head"] = RemoveHeadCommand()
         commandMap["add_if_max"] = AddIfMaxCommand()
