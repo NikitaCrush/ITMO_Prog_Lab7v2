@@ -6,7 +6,7 @@ import commandArguments.CommandType
 /**
  * The RemoveFirstCommand class removes the first element in the lab work collection.
  *
- * @property labWorkCollection The lab work collection to remove the first element from.
+ * @property labWorkService The lab work collection to remove the first element from.
  */
 class RemoveFirstCommand : Command() {
     override val commandType = CommandType.NO_ARG
@@ -20,7 +20,7 @@ class RemoveFirstCommand : Command() {
         val owner = userCollection.validateToken(token)
             ?: throw IllegalArgumentException("Invalid token.")
 
-        labWorkCollection.removeFirst(owner)
+        labWorkService.removeFirst(owner)
         return "First element removed successfully."
     }
 

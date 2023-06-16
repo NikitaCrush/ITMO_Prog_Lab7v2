@@ -10,7 +10,7 @@ import kotlinx.serialization.json.Json
  * The UpdateCommand class is responsible for updating a specific lab work in the collection
  * by providing a valid ID.
  *
- * @property labWorkCollection The lab work collection to be updated.
+ * @property labWorkService The lab work collection to be updated.
  */
 
 
@@ -35,10 +35,10 @@ class UpdateCommand : Command() {
         val owner = userCollection.validateToken(token)
             ?: throw IllegalArgumentException("Invalid token.")
 
-        val labWorkToUpdate = labWorkCollection.show().find { it.id == id && it.owner == owner }
+        val labWorkToUpdate = labWorkService.show().find { it.id == id && it.owner == owner }
 
         return if (labWorkToUpdate != null) {
-            labWorkCollection.update(id, updatedLabWork)
+            labWorkService.update(id, updatedLabWork)
             "Lab work with ID: $id has been updated."
         } else {
             "No lab work found with ID: $id that belongs to the current user."

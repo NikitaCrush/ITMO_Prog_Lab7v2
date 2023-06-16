@@ -7,13 +7,13 @@ import commandArguments.CommandType
  * The PrintUniqueMinimalPointCommand class prints the unique minimalPoint values of all
  * lab works in the collection.
  *
- * @property labWorkCollection The lab work collection to be used for printing unique minimalPoint values.
+ * @property labWorkService The lab work collection to be used for printing unique minimalPoint values.
  */
 class PrintUniqueMinimalPointCommand : Command() {
     override val commandType = CommandType.NO_ARG
     override val commandArgs = emptyList<CommandArgument>()
 
     override fun execute(args: List<Any>, token: String?): String {
-        return labWorkCollection.printUniqueMinimalPoint().joinToString("\n")
+        return labWorkService.printUniqueMinimalPoint().joinToString("\n")
     }
 }

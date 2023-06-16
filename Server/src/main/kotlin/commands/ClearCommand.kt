@@ -7,7 +7,7 @@ import data.Messages
 /**
  * The ClearCommand class clears the lab work collection.
  *
- * @property labWorkCollection The lab work collection to be cleared.
+ * @property labWorkService The lab work collection to be cleared.
  */
 class ClearCommand : Command() {
     override val commandType = CommandType.NO_ARG
@@ -21,7 +21,7 @@ class ClearCommand : Command() {
         val owner = userCollection.validateToken(token)
             ?: throw IllegalArgumentException("Invalid token.")
 
-        labWorkCollection.clear(owner)
+        labWorkService.clear(owner)
         return Messages.LAB_WORK_SUCCESS_CLEAR
     }
 
