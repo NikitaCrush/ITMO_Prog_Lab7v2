@@ -10,8 +10,9 @@ import java.util.*
 val koinModule = module {
     single { Stack<String>() }
     single { DatabaseManager() }
-    single { LabWorkCollection() }
-    single { UserCollection(get()) }
+    single { LabWorkService() }
+    single { LabWorkRepository() }
+    single { UserCollection() }
     single { CommandExecutor() }
     single { RequestHandler() }
 }
