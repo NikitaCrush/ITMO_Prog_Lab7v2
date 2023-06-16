@@ -1,24 +1,44 @@
 package utils
 
 import data.User
-import java.util.Scanner
 
+/**
+ * Reads and constructs User data.
+ */
 class ProfileReader {
     private val hashUtil = HashUtil()
-    private val scanner = Scanner(System.`in`)
 
+    /**
+     * Reads a username from the console.
+     *
+     * @return The username as a string.
+     */
     private fun readUsername(): String {
         print("Enter your username: ")
-        return scanner.nextLine()
+        return readlnOrNull() ?: ""
     }
 
+    /**
+     * Reads a password from the console and hashes it.
+     *
+     * @return The hashed password as a string.
+     */
     private fun readPassword(): String {
         print("Enter your password: ")
-        return scanner.nextLine().toString().let { hashUtil.hashPassword(it) }
+        val password = readlnOrNull() ?: ""
+        return hashUtil.hashPassword(password)
     }
+
+    /**
+     * Reads a username and password from the console and constructs a User object.
+     *
+     * @return The constructed User object.
+     */
     fun readUser(): User {
         val username = readUsername()
         val password = readPassword()
-        return User(username,password)
+        val user = User(username,password)
+        ProfileValidator().validate(user)  // Validate the user
+        return user
     }
 }
