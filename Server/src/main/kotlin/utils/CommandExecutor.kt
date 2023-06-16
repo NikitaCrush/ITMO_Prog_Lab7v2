@@ -9,25 +9,25 @@ import java.util.*
  *
  */
 class CommandExecutor {
-    private val commandMap: MutableMap<String, Command> = mutableMapOf()
-
-    init {
-        commandMap["help"] = HelpCommand(this)
-        commandMap["info"] = InfoCommand()
-        commandMap["show"] = ShowCommand()
-        commandMap["add"] = AddCommand()
-        commandMap["update"] = UpdateCommand()
-        commandMap["remove_by_id"] = RemoveByIdCommand()
-        commandMap["clear"] = ClearCommand()
-        commandMap["remove_first"] = RemoveFirstCommand()
-        commandMap["remove_head"] = RemoveHeadCommand()
-        commandMap["add_if_max"] = AddIfMaxCommand()
-        commandMap["sum_of_minimal_point"] = SumOfMinimalPointCommand()
-        commandMap["min_by_difficulty"] = MinByDifficultyCommand()
-        commandMap["print_unique_minimal_point"] = PrintUniqueMinimalPointCommand()
-        commandMap["register"] = RegisterCommand()
-        commandMap["login"] = LoginCommand()
-        commandMap["logout"] = LogoutCommand()
+    private val commandMap: MutableMap<String, Command> by lazy {
+        mutableMapOf<String, Command>().apply {
+            this["help"] = HelpCommand(this@CommandExecutor)
+            this["info"] = InfoCommand()
+            this["show"] = ShowCommand()
+            this["add"] = AddCommand()
+            this["update"] = UpdateCommand()
+            this["remove_by_id"] = RemoveByIdCommand()
+            this["clear"] = ClearCommand()
+            this["remove_first"] = RemoveFirstCommand()
+            this["remove_head"] = RemoveHeadCommand()
+            this["add_if_max"] = AddIfMaxCommand()
+            this["sum_of_minimal_point"] = SumOfMinimalPointCommand()
+            this["min_by_difficulty"] = MinByDifficultyCommand()
+            this["print_unique_minimal_point"] = PrintUniqueMinimalPointCommand()
+            this["register"] = RegisterCommand()
+            this["login"] = LoginCommand()
+            this["logout"] = LogoutCommand()
+        }
     }
 
 

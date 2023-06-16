@@ -10,9 +10,10 @@ import java.util.*
 val koinModule = module {
     single { Stack<String>() }
     single { DatabaseManager() }
-    single { LabWorkCollection()}
-    single {UserCollection(DatabaseManager())}
-
+    single { LabWorkCollection() }
+    single { UserCollection(get()) }
+    single { CommandExecutor() }
+    single { RequestHandler() }
 }
 
 fun main() {
@@ -20,10 +21,10 @@ fun main() {
         modules(koinModule)
     }
 
-    val commandExecutor = CommandExecutor()
-    val serverManager = ServerManager(12345) // assuming 12345 is your port number
+    val serverManager = ServerManager(12345)
 
     runBlocking {
-        serverManager.startServer(commandExecutor)
+        serverManager.startServer()
     }
 }
+
