@@ -63,21 +63,21 @@ class ClientManager(private val host: String, private val port: Int) {
             // Notify the CommandInterpreter about the received token.
             receiveToken(token)
             // Remove the token from the message before returning the response.
-        } else if (response.message == Messages.LOGIN_FAIL || response.message == Messages.REGISTRATION_FAIL) {
+        } else if (response.message == Messages.LOGIN_FAIL || response.message == Messages.REGISTRATION_FAIL || response.message == Messages.REGISTRATION_SUCCESS) {
             // Notify the CommandInterpreter about the failed login or registration.
             failedLoginOrRegistration()
         }
 
         return response
     }
-    fun receiveToken(token: String) {
+    private fun receiveToken(token: String) {
         this.token = token
     }
     fun setCommandInterpreter(commandInterpreter: CommandInterpreter) {
         this.commandInterpreter = commandInterpreter
     }
 
-    fun failedLoginOrRegistration() {
+    private fun failedLoginOrRegistration() {
         commandInterpreter?.failedLoginOrRegistration()
         this.token = null
     }
