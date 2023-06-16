@@ -1,4 +1,4 @@
-package commands
+package commandsForRegAndLogIn
 
 import commandArguments.CommandArgument
 import commandArguments.CommandType

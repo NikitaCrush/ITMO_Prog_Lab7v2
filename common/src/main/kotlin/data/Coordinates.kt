@@ -12,4 +12,4 @@ import kotlinx.serialization.Serializable
 data class Coordinates(
     val x: Long,
     val y: Double
-) : java.io.Serializable
+)
