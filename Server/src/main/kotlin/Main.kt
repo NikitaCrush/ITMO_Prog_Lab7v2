@@ -1,7 +1,6 @@
 package server
 
 import databaseManager.DatabaseManager
-import kotlinx.coroutines.runBlocking
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import utils.*
@@ -24,7 +23,7 @@ fun main() {
 
     val serverManager = ServerManager(12345)
 
-    runBlocking {
+    run {
         serverManager.startServer()
     }
 }

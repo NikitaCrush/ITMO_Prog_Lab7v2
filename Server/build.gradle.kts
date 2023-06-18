@@ -1,4 +1,3 @@
-
 plugins {
     kotlin("jvm") version "1.8.0"
     application
@@ -36,4 +35,22 @@ kotlin {
 
 application {
     mainClass.set("MainKt")
+}
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "MainKt"
+    }
+    configurations["compileClasspath"].forEach { file: File ->
+        from(zipTree(file.absoluteFile))
+    }
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+
+application {
+    mainClass.set("MainKt")
+}
+
+subprojects {
+    apply(plugin = "org.jetbrains.dokka")
 }
